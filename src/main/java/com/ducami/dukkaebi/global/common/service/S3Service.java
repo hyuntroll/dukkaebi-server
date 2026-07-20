@@ -1,6 +1,7 @@
 package com.ducami.dukkaebi.global.common.service;
 
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.AmazonS3URI;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
@@ -14,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 
 @Slf4j
 @Service
@@ -77,6 +79,25 @@ public class S3Service implements StorageService {
      */
     @Override
     public String extractFileNameFromUrl(String fileUrl) {
-        return fileUrl.substring(fileUrl.indexOf(bucketName) + bucketName.length() + 1);
+        if (fileUrl == null || fileUrl.isBlank()) {
+            throw new IllegalArgumentException("파일 URL이 비어 있습니다.");
+        }
+
+        AmazonS3URI s3Uri;
+        try {
+            s3Uri = new AmazonS3URI(URI.create(fileUrl));
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("올바르지 않은 S3 파일 URL입니다.", e);
+        }
+
+        if (!bucketName.equals(s3Uri.getBucket())) {
+            throw new IllegalArgumentException("현재 S3 버킷의 파일 URL이 아닙니다.");
+        }
+
+        String fileName = s3Uri.getKey();
+        if (fileName == null || fileName.isBlank()) {
+            throw new IllegalArgumentException("S3 파일 경로가 비어 있습니다.");
+        }
+        return fileName;
     }
 }
