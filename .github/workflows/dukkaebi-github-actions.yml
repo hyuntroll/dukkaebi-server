@@ -33,11 +33,15 @@ jobs:
           spring.data.redis.host: ${{ secrets.REDIS_HOST }}
           spring.data.redis.port: ${{ secrets.REDIS_PORT }}
           jwt.secretKey: ${{ secrets.SECRET_KEY }}
+          server.domain: ${{ secrets.SERVER_DOMAIN }}
+          storage.provider: s3
+          storage.local.root-path: /var/lib/dukkaebi/uploads
+          storage.local.public-base-path: /files
           gemini.api-key: ${{ secrets.GEMINI_API_KEY }}
           gemini.grading-api-key: ${{ secrets.GEMINI_GRADING_API_KEY }}
           cloud.aws.s3.bucket: ${{ secrets.BUCKET_NAME }}
-          cloud.aws.credentials.accessKey: ${{ secrets.AWS_ACCESS_KEY }}
-          cloud.aws.credentials.secretKey: ${{ secrets.AWS_SECRET_KEY }}
+          cloud.aws.credentials.access-key: ${{ secrets.AWS_ACCESS_KEY }}
+          cloud.aws.credentials.secret-key: ${{ secrets.AWS_SECRET_KEY }}
 
       # 2. Gradle 캐시 (의존성 빠른 복원)
       - name: Cache Gradle packages
