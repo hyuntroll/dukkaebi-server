@@ -17,6 +17,9 @@ public class SpringConfig implements WebMvcConfigurer {
     @Value("${storage.local.public-base-path}")
     private String localStoragePublicBasePath;
 
+    @Value("${storage.provider:local}")
+    private String storageProvider;
+
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new  BCryptPasswordEncoder();
@@ -24,11 +27,19 @@ public class SpringConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        if (!"local".equalsIgnoreCase(storageProvider)) {
+            return;
+        }
+
         String resourceLocation = Paths.get(localStorageRootPath)
                 .toAbsolutePath()
                 .normalize()
                 .toUri()
                 .toString();
+
+        if (!resourceLocation.endsWith("/")) {
+            resourceLocation += "/";
+        }
 
         registry.addResourceHandler(normalizePath(localStoragePublicBasePath) + "/**")
                 .addResourceLocations(resourceLocation);
